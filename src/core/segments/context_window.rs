@@ -423,10 +423,7 @@ mod tests {
 
         assert_eq!(segment.primary, "23% · 229.9k tokens");
         assert_eq!(segment.metadata.get("tokens"), Some(&"229900".to_string()));
-        assert_eq!(
-            segment.metadata.get("limit"),
-            Some(&"1000000".to_string())
-        );
+        assert_eq!(segment.metadata.get("limit"), Some(&"1000000".to_string()));
     }
 
     #[test]
@@ -439,10 +436,7 @@ mod tests {
 
         let segment = collect_from_value(input);
 
-        assert_eq!(
-            segment.metadata.get("limit"),
-            Some(&"1000000".to_string())
-        );
+        assert_eq!(segment.metadata.get("limit"), Some(&"1000000".to_string()));
         assert_eq!(segment.metadata.get("tokens"), Some(&"10000".to_string()));
         assert_eq!(segment.primary, "1% · 10k tokens");
     }
@@ -498,9 +492,6 @@ mod tests {
 
         assert_eq!(segment.primary, "23% · 229.9k tokens");
         assert_eq!(segment.metadata.get("tokens"), Some(&"229900".to_string()));
-        assert_eq!(
-            segment.metadata.get("limit"),
-            Some(&"1000000".to_string())
-        );
+        assert_eq!(segment.metadata.get("limit"), Some(&"1000000".to_string()));
     }
 }
