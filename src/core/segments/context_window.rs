@@ -1,5 +1,5 @@
 use super::{Segment, SegmentData};
-use crate::config::{InputData, ModelConfig, SegmentId, TranscriptEntry};
+use crate::config::{ContextWindow, InputData, ModelConfig, SegmentId, TranscriptEntry};
 use std::collections::HashMap;
 use std::fs;
 use std::io::{BufRead, BufReader};
@@ -7,6 +7,13 @@ use std::path::{Path, PathBuf};
 
 #[derive(Default)]
 pub struct ContextWindowSegment;
+
+#[derive(Debug, Clone, Copy)]
+struct ContextUsageSnapshot {
+    used_tokens: u64,
+    context_limit: u64,
+    percentage: f64,
+}
 
 impl ContextWindowSegment {
     pub fn new() -> Self {
@@ -23,52 +30,35 @@ impl ContextWindowSegment {
 impl Segment for ContextWindowSegment {
     fn collect(&self, input: &InputData) -> Option<SegmentData> {
         // Dynamically determine context limit based on current model ID
-        let context_limit = Self::get_context_limit_for_model(&input.model.id);
+        let model_context_limit = Self::get_context_limit_for_model(&input.model.id) as u64;
+        let usage = official_context_usage(input.context_window.as_ref(), model_context_limit)
+            .or_else(|| {
+                parse_transcript_usage(&input.transcript_path).and_then(|used_tokens| {
+                    build_usage_snapshot(used_tokens as u64, model_context_limit, None)
+                })
+            });
 
-        let context_used_token_opt = parse_transcript_usage(&input.transcript_path);
-
-        let (percentage_display, tokens_display) = match context_used_token_opt {
-            Some(context_used_token) => {
-                let context_used_rate = (context_used_token as f64 / context_limit as f64) * 100.0;
-
-                let percentage = if context_used_rate.fract() == 0.0 {
-                    format!("{:.0}%", context_used_rate)
-                } else {
-                    format!("{:.1}%", context_used_rate)
-                };
-
-                let tokens = if context_used_token >= 1000 {
-                    let k_value = context_used_token as f64 / 1000.0;
-                    if k_value.fract() == 0.0 {
-                        format!("{}k", k_value as u32)
-                    } else {
-                        format!("{:.1}k", k_value)
-                    }
-                } else {
-                    context_used_token.to_string()
-                };
-
-                (percentage, tokens)
-            }
-            None => {
-                // No usage data available
-                ("-".to_string(), "-".to_string())
-            }
+        let (percentage_display, tokens_display) = match usage {
+            Some(snapshot) => (
+                format_percentage(snapshot.percentage),
+                format_tokens(snapshot.used_tokens),
+            ),
+            None => ("-".to_string(), "-".to_string()),
         };
 
         let mut metadata = HashMap::new();
-        match context_used_token_opt {
-            Some(context_used_token) => {
-                let context_used_rate = (context_used_token as f64 / context_limit as f64) * 100.0;
-                metadata.insert("tokens".to_string(), context_used_token.to_string());
-                metadata.insert("percentage".to_string(), context_used_rate.to_string());
+        match usage {
+            Some(snapshot) => {
+                metadata.insert("tokens".to_string(), snapshot.used_tokens.to_string());
+                metadata.insert("percentage".to_string(), snapshot.percentage.to_string());
+                metadata.insert("limit".to_string(), snapshot.context_limit.to_string());
             }
             None => {
                 metadata.insert("tokens".to_string(), "-".to_string());
                 metadata.insert("percentage".to_string(), "-".to_string());
+                metadata.insert("limit".to_string(), model_context_limit.to_string());
             }
         }
-        metadata.insert("limit".to_string(), context_limit.to_string());
         metadata.insert("model".to_string(), input.model.id.clone());
 
         Some(SegmentData {
@@ -80,6 +70,88 @@ impl Segment for ContextWindowSegment {
 
     fn id(&self) -> SegmentId {
         SegmentId::ContextWindow
+    }
+}
+
+fn official_context_usage(
+    context_window: Option<&ContextWindow>,
+    model_context_limit: u64,
+) -> Option<ContextUsageSnapshot> {
+    let context_window = context_window?;
+    let context_limit = context_window
+        .context_window_size
+        .filter(|limit| *limit > 0)
+        .unwrap_or(model_context_limit);
+    let percentage = context_window
+        .used_percentage
+        .filter(|value| value.is_finite());
+    let used_tokens = official_used_tokens(context_window).or_else(|| {
+        percentage.map(|value| ((value / 100.0) * context_limit as f64).round() as u64)
+    })?;
+
+    build_usage_snapshot(used_tokens, context_limit, percentage)
+}
+
+fn official_used_tokens(context_window: &ContextWindow) -> Option<u64> {
+    if let Some(total_input_tokens) = context_window.total_input_tokens {
+        return Some(total_input_tokens);
+    }
+
+    context_window.current_usage.as_ref().and_then(|usage| {
+        let has_counted_tokens = usage.input_tokens.is_some()
+            || usage.cache_creation_input_tokens.is_some()
+            || usage.cache_read_input_tokens.is_some();
+
+        if has_counted_tokens {
+            Some(
+                usage.input_tokens.unwrap_or(0)
+                    + usage.cache_creation_input_tokens.unwrap_or(0)
+                    + usage.cache_read_input_tokens.unwrap_or(0),
+            )
+        } else {
+            None
+        }
+    })
+}
+
+fn build_usage_snapshot(
+    used_tokens: u64,
+    context_limit: u64,
+    percentage: Option<f64>,
+) -> Option<ContextUsageSnapshot> {
+    if context_limit == 0 {
+        return None;
+    }
+
+    let percentage = percentage
+        .filter(|value| value.is_finite())
+        .unwrap_or_else(|| (used_tokens as f64 / context_limit as f64) * 100.0);
+
+    Some(ContextUsageSnapshot {
+        used_tokens,
+        context_limit,
+        percentage,
+    })
+}
+
+fn format_percentage(percentage: f64) -> String {
+    if percentage.fract() == 0.0 {
+        format!("{:.0}%", percentage)
+    } else {
+        format!("{:.1}%", percentage)
+    }
+}
+
+fn format_tokens(tokens: u64) -> String {
+    if tokens >= 1000 {
+        let k_value = tokens as f64 / 1000.0;
+        if k_value.fract() == 0.0 {
+            format!("{}k", k_value as u64)
+        } else {
+            format!("{:.1}k", k_value)
+        }
+    } else {
+        tokens.to_string()
     }
 }
 
@@ -269,4 +341,166 @@ fn try_find_usage_from_project_history(transcript_path: &Path) -> Option<u32> {
     }
 
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::InputData;
+    use serde_json::{json, Value};
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    struct TempTranscript {
+        path: PathBuf,
+    }
+
+    impl TempTranscript {
+        fn new(lines: &[&str]) -> Self {
+            let unique = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("system time should be after Unix epoch")
+                .as_nanos();
+            let path = std::env::temp_dir().join(format!(
+                "ccline-context-window-test-{}-{unique}.jsonl",
+                std::process::id()
+            ));
+            fs::write(&path, lines.join("\n")).expect("test transcript should be writable");
+            Self { path }
+        }
+
+        fn path_str(&self) -> &str {
+            self.path
+                .to_str()
+                .expect("test transcript path should be valid UTF-8")
+        }
+    }
+
+    impl Drop for TempTranscript {
+        fn drop(&mut self) {
+            let _ = fs::remove_file(&self.path);
+        }
+    }
+
+    fn base_input(transcript_path: &str) -> Value {
+        json!({
+            "model": {
+                "id": "claude-sonnet-4",
+                "display_name": "Claude Sonnet 4"
+            },
+            "workspace": {
+                "current_dir": "/tmp"
+            },
+            "transcript_path": transcript_path
+        })
+    }
+
+    fn collect_from_value(value: Value) -> SegmentData {
+        let input: InputData =
+            serde_json::from_value(value).expect("test input should deserialize");
+        ContextWindowSegment::new()
+            .collect(&input)
+            .expect("context window segment should render")
+    }
+
+    #[test]
+    fn official_context_window_overrides_zero_transcript_usage() {
+        let transcript = TempTranscript::new(&[
+            r#"{"type":"assistant","message":{"usage":{"input_tokens":0,"output_tokens":0}}}"#,
+        ]);
+        let mut input = base_input(transcript.path_str());
+        input["context_window"] = json!({
+            "context_window_size": 1_000_000u64,
+            "used_percentage": 23.0f64,
+            "current_usage": {
+                "input_tokens": 229_900u64,
+                "output_tokens": 9_999u64,
+                "cache_creation_input_tokens": 0u64,
+                "cache_read_input_tokens": 0u64
+            }
+        });
+
+        let segment = collect_from_value(input);
+
+        assert_eq!(segment.primary, "23% · 229.9k tokens");
+        assert_eq!(segment.metadata.get("tokens"), Some(&"229900".to_string()));
+        assert_eq!(
+            segment.metadata.get("limit"),
+            Some(&"1000000".to_string())
+        );
+    }
+
+    #[test]
+    fn official_context_window_size_sets_limit_metadata() {
+        let mut input = base_input("/tmp/missing-transcript.jsonl");
+        input["context_window"] = json!({
+            "total_input_tokens": 10_000u64,
+            "context_window_size": 1_000_000u64
+        });
+
+        let segment = collect_from_value(input);
+
+        assert_eq!(
+            segment.metadata.get("limit"),
+            Some(&"1000000".to_string())
+        );
+        assert_eq!(segment.metadata.get("tokens"), Some(&"10000".to_string()));
+        assert_eq!(segment.primary, "1% · 10k tokens");
+    }
+
+    #[test]
+    fn official_current_usage_does_not_count_output_tokens() {
+        let mut input = base_input("/tmp/missing-transcript.jsonl");
+        input["context_window"] = json!({
+            "context_window_size": 200_000u64,
+            "current_usage": {
+                "input_tokens": 1_000u64,
+                "output_tokens": 200u64,
+                "cache_creation_input_tokens": 50u64,
+                "cache_read_input_tokens": 25u64
+            }
+        });
+
+        let segment = collect_from_value(input);
+
+        assert_eq!(segment.metadata.get("tokens"), Some(&"1075".to_string()));
+        assert_eq!(segment.primary, "0.5% · 1.1k tokens");
+    }
+
+    #[test]
+    fn incomplete_official_context_window_falls_back_to_transcript_usage() {
+        let transcript = TempTranscript::new(&[
+            r#"{"type":"assistant","message":{"usage":{"input_tokens":0,"output_tokens":0}}}"#,
+        ]);
+        let mut input = base_input(transcript.path_str());
+        input["context_window"] = json!({});
+
+        let segment = collect_from_value(input);
+
+        assert_eq!(segment.primary, "0% · 0 tokens");
+        assert_eq!(segment.metadata.get("tokens"), Some(&"0".to_string()));
+    }
+
+    #[test]
+    fn camel_case_official_context_window_fields_deserialize() {
+        let mut input = base_input("/tmp/missing-transcript.jsonl");
+        input["contextWindow"] = json!({
+            "contextWindowSize": 1_000_000u64,
+            "usedPercentage": 23.0f64,
+            "currentUsage": {
+                "inputTokens": 229_900u64,
+                "outputTokens": 9_999u64,
+                "cacheCreationInputTokens": 0u64,
+                "cacheReadInputTokens": 0u64
+            }
+        });
+
+        let segment = collect_from_value(input);
+
+        assert_eq!(segment.primary, "23% · 229.9k tokens");
+        assert_eq!(segment.metadata.get("tokens"), Some(&"229900".to_string()));
+        assert_eq!(
+            segment.metadata.get("limit"),
+            Some(&"1000000".to_string())
+        );
+    }
 }

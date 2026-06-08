@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::HashMap;
 
 // Main config structure
@@ -117,6 +117,51 @@ pub struct InputData {
     pub transcript_path: String,
     pub cost: Option<Cost>,
     pub output_style: Option<OutputStyle>,
+    #[serde(
+        default,
+        alias = "contextWindow",
+        deserialize_with = "deserialize_context_window"
+    )]
+    pub context_window: Option<ContextWindow>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+pub struct ContextWindow {
+    #[serde(default, alias = "totalInputTokens")]
+    pub total_input_tokens: Option<u64>,
+    #[serde(default, alias = "totalOutputTokens")]
+    pub total_output_tokens: Option<u64>,
+    #[serde(default, alias = "contextWindowSize")]
+    pub context_window_size: Option<u64>,
+    #[serde(default, alias = "usedPercentage")]
+    pub used_percentage: Option<f64>,
+    #[serde(default, alias = "remainingPercentage")]
+    pub remaining_percentage: Option<f64>,
+    #[serde(default, alias = "currentUsage")]
+    pub current_usage: Option<ContextWindowUsage>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+pub struct ContextWindowUsage {
+    #[serde(default, alias = "inputTokens")]
+    pub input_tokens: Option<u64>,
+    #[serde(default, alias = "outputTokens")]
+    pub output_tokens: Option<u64>,
+    #[serde(default, alias = "cacheCreationInputTokens")]
+    pub cache_creation_input_tokens: Option<u64>,
+    #[serde(default, alias = "cacheReadInputTokens")]
+    pub cache_read_input_tokens: Option<u64>,
+}
+
+fn deserialize_context_window<'de, D>(deserializer: D) -> Result<Option<ContextWindow>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value = Option::<serde_json::Value>::deserialize(deserializer)?;
+    match value {
+        Some(value @ serde_json::Value::Object(_)) => Ok(serde_json::from_value(value).ok()),
+        _ => Ok(None),
+    }
 }
 
 // OpenAI-style nested token details
