@@ -43,18 +43,24 @@
 
 ```bash
 # 全局安装
-npm install -g @cometix/ccline
+npm install -g @panden/ccline
 
 # 或使用 yarn
-yarn global add @cometix/ccline
+yarn global add @panden/ccline
 
 # 或使用 pnpm
-pnpm add -g @cometix/ccline
+pnpm add -g @panden/ccline
 ```
 
 使用镜像源加速下载：
 ```bash
-npm install -g @cometix/ccline --registry https://registry.npmmirror.com
+npm install -g @panden/ccline --registry https://registry.npmmirror.com
+```
+
+如果你正在从上游包切换，建议先卸载上游包，避免全局 `ccline` 命令和 Claude Code 安装目标冲突：
+
+```bash
+npm uninstall -g @cometix/ccline
 ```
 
 安装后：
@@ -96,7 +102,7 @@ npm install -g @cometix/ccline --registry https://registry.npmmirror.com
 ### 更新
 
 ```bash
-npm update -g @cometix/ccline
+npm update -g @panden/ccline
 ```
 
 <details>

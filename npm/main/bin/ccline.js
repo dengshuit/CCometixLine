@@ -77,14 +77,14 @@ if (platform === 'linux') {
 }
 
 const packageMap = {
-  'darwin-x64': '@cometix/ccline-darwin-x64',
-  'darwin-arm64': '@cometix/ccline-darwin-arm64',
-  'linux-x64': '@cometix/ccline-linux-x64',
-  'linux-x64-musl': '@cometix/ccline-linux-x64-musl',
-  'linux-arm64': '@cometix/ccline-linux-arm64',
-  'linux-arm64-musl': '@cometix/ccline-linux-arm64-musl',
-  'win32-x64': '@cometix/ccline-win32-x64',
-  'win32-ia32': '@cometix/ccline-win32-x64', // Use 64-bit for 32-bit systems
+  'darwin-x64': '@panden/ccline-darwin-x64',
+  'darwin-arm64': '@panden/ccline-darwin-arm64',
+  'linux-x64': '@panden/ccline-linux-x64',
+  'linux-x64-musl': '@panden/ccline-linux-x64-musl',
+  'linux-arm64': '@panden/ccline-linux-arm64',
+  'linux-arm64-musl': '@panden/ccline-linux-arm64-musl',
+  'win32-x64': '@panden/ccline-win32-x64',
+  'win32-ia32': '@panden/ccline-win32-x64', // Use 64-bit for 32-bit systems
 };
 
 const packageName = packageMap[platformKey];
@@ -101,7 +101,7 @@ const binaryPath = path.join(__dirname, '..', 'node_modules', packageName, binar
 if (!fs.existsSync(binaryPath)) {
   console.error(`Error: Binary not found at ${binaryPath}`);
   console.error('This might indicate a failed installation or unsupported platform.');
-  console.error('Please try reinstalling: npm install -g @cometix/ccline');
+  console.error('Please try reinstalling: npm install -g @panden/ccline');
   console.error(`Expected package: ${packageName}`);
   process.exit(1);
 }

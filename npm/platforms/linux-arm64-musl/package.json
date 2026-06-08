@@ -1,5 +1,5 @@
 {
-  "name": "@cometix/ccline-linux-arm64-musl",
+  "name": "@panden/ccline-linux-arm64-musl",
   "version": "0.0.0",
   "description": "Linux ARM64 binary (musl) for CCometixLine",
   "files": ["ccline"],
