@@ -1,11 +1,11 @@
-# @panden/ccline
+# @panden/cclinepro
 
 CCometixLine - High-performance Claude Code StatusLine tool
 
 ## Installation
 
 ```bash
-npm install -g @panden/ccline
+npm install -g @panden/cclinepro
 ```
 
 ## Features
@@ -32,7 +32,7 @@ ccline --version
 Use npm mirror for faster installation:
 
 ```bash
-npm install -g @panden/ccline --registry https://registry.npmmirror.com
+npm install -g @panden/cclinepro --registry https://registry.npmmirror.com
 ```
 
 ## More Information

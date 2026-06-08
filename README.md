@@ -43,24 +43,24 @@ Install via npm (works on all platforms):
 
 ```bash
 # Install globally
-npm install -g @panden/ccline
+npm install -g @panden/cclinepro
 
 # Or using yarn
-yarn global add @panden/ccline
+yarn global add @panden/cclinepro
 
 # Or using pnpm
-pnpm add -g @panden/ccline
+pnpm add -g @panden/cclinepro
 ```
 
 Use npm mirror for faster download:
 ```bash
-npm install -g @panden/ccline --registry https://registry.npmmirror.com
+npm install -g @panden/cclinepro --registry https://registry.npmmirror.com
 ```
 
-If you are switching from the upstream package, uninstall it first to avoid global `ccline` command and Claude Code install target conflicts:
+If you are switching from an older package name, uninstall it first to avoid global `ccline` command and Claude Code install target conflicts:
 
 ```bash
-npm uninstall -g @cometix/ccline
+npm uninstall -g @panden/ccline @cometix/ccline
 ```
 
 After installation:
@@ -102,7 +102,7 @@ Add to your Claude Code `settings.json`:
 ### Update
 
 ```bash
-npm update -g @panden/ccline
+npm update -g @panden/cclinepro
 ```
 
 <details>

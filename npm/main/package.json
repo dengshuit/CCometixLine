@@ -1,5 +1,5 @@
 {
-  "name": "@panden/ccline",
+  "name": "@panden/cclinepro",
   "version": "0.0.0",
   "description": "CCometixLine - High-performance Claude Code StatusLine tool",
   "bin": {
@@ -9,13 +9,13 @@
     "postinstall": "node scripts/postinstall.js"
   },
   "optionalDependencies": {
-    "@panden/ccline-darwin-x64": "0.0.0",
-    "@panden/ccline-darwin-arm64": "0.0.0",
-    "@panden/ccline-linux-x64": "0.0.0",
-    "@panden/ccline-linux-x64-musl": "0.0.0",
-    "@panden/ccline-linux-arm64": "0.0.0",
-    "@panden/ccline-linux-arm64-musl": "0.0.0",
-    "@panden/ccline-win32-x64": "0.0.0"
+    "@panden/cclinepro-darwin-x64": "0.0.0",
+    "@panden/cclinepro-darwin-arm64": "0.0.0",
+    "@panden/cclinepro-linux-x64": "0.0.0",
+    "@panden/cclinepro-linux-x64-musl": "0.0.0",
+    "@panden/cclinepro-linux-arm64": "0.0.0",
+    "@panden/cclinepro-linux-arm64-musl": "0.0.0",
+    "@panden/cclinepro-win32-x64": "0.0.0"
   },
   "repository": {
     "type": "git",

@@ -1,5 +1,5 @@
 {
-  "name": "@panden/ccline-linux-x64",
+  "name": "@panden/cclinepro-linux-x64",
   "version": "0.0.0",
   "description": "Linux x64 binary for CCometixLine",
   "files": ["ccline"],

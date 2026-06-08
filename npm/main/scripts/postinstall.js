@@ -72,14 +72,14 @@ try {
   }
 
   const packageMap = {
-    'darwin-x64': '@panden/ccline-darwin-x64',
-    'darwin-arm64': '@panden/ccline-darwin-arm64',
-    'linux-x64': '@panden/ccline-linux-x64',
-    'linux-x64-musl': '@panden/ccline-linux-x64-musl',
-    'linux-arm64': '@panden/ccline-linux-arm64',
-    'linux-arm64-musl': '@panden/ccline-linux-arm64-musl',
-    'win32-x64': '@panden/ccline-win32-x64',
-    'win32-ia32': '@panden/ccline-win32-x64', // Use 64-bit for 32-bit
+    'darwin-x64': '@panden/cclinepro-darwin-x64',
+    'darwin-arm64': '@panden/cclinepro-darwin-arm64',
+    'linux-x64': '@panden/cclinepro-linux-x64',
+    'linux-x64-musl': '@panden/cclinepro-linux-x64-musl',
+    'linux-arm64': '@panden/cclinepro-linux-arm64',
+    'linux-arm64-musl': '@panden/cclinepro-linux-arm64-musl',
+    'win32-x64': '@panden/cclinepro-win32-x64',
+    'win32-ia32': '@panden/cclinepro-win32-x64', // Use 64-bit for 32-bit
   };
 
   const packageName = packageMap[platformKey];
