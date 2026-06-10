@@ -7,8 +7,12 @@
   "cpu": ["x64"],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Haleclipse/CCometixLine"
+    "url": "https://github.com/dengshuit/CCometixLine"
   },
-  "author": "Haleclipse",
+  "homepage": "https://github.com/dengshuit/CCometixLine#readme",
+  "bugs": {
+    "url": "https://github.com/dengshuit/CCometixLine/issues"
+  },
+  "author": "panden",
   "license": "MIT"
 }

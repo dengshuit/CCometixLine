@@ -91,7 +91,7 @@ const packageName = packageMap[platformKey];
 if (!packageName) {
   console.error(`Error: Unsupported platform ${platformKey}`);
   console.error('Supported platforms: darwin (x64/arm64), linux (x64/arm64), win32 (x64)');
-  console.error('Please visit https://github.com/Haleclipse/CCometixLine for manual installation');
+  console.error('Please visit https://github.com/dengshuit/CCometixLine for manual installation');
   process.exit(1);
 }
 

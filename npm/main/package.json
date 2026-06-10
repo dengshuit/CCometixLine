@@ -19,10 +19,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Haleclipse/CCometixLine"
+    "url": "https://github.com/dengshuit/CCometixLine"
+  },
+  "homepage": "https://github.com/dengshuit/CCometixLine#readme",
+  "bugs": {
+    "url": "https://github.com/dengshuit/CCometixLine/issues"
   },
   "keywords": ["claude", "statusline", "claude-code", "rust", "cli"],
-  "author": "Haleclipse",
+  "author": "panden",
   "license": "MIT",
   "engines": {
     "node": ">=14.0.0"
