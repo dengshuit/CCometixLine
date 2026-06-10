@@ -37,8 +37,8 @@ npm install -g @panden/cclinepro --registry https://registry.npmmirror.com
 
 ## More Information
 
-- GitHub: https://github.com/dengshuit/CCometixLine
-- Issues: https://github.com/dengshuit/CCometixLine/issues
+- GitHub: https://github.com/dengshuit/cclinepro
+- Issues: https://github.com/dengshuit/cclinepro/issues
 - License: MIT
 
 ## Upstream / Acknowledgements

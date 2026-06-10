@@ -19,11 +19,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dengshuit/CCometixLine"
+    "url": "https://github.com/dengshuit/cclinepro"
   },
-  "homepage": "https://github.com/dengshuit/CCometixLine#readme",
+  "homepage": "https://github.com/dengshuit/cclinepro#readme",
   "bugs": {
-    "url": "https://github.com/dengshuit/CCometixLine/issues"
+    "url": "https://github.com/dengshuit/cclinepro/issues"
   },
   "keywords": ["claude", "statusline", "claude-code", "rust", "cli"],
   "author": "panden",

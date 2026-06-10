@@ -108,14 +108,14 @@ npm update -g @panden/cclinepro
 <details>
 <summary>Manual Installation (Click to expand)</summary>
 
-Alternatively, download from [Releases](https://github.com/dengshuit/CCometixLine/releases):
+Alternatively, download from [Releases](https://github.com/dengshuit/cclinepro/releases):
 
 #### Linux
 
 #### Option 1: Dynamic Binary (Recommended)
 ```bash
 mkdir -p ~/.claude/ccline
-wget https://github.com/dengshuit/CCometixLine/releases/latest/download/ccline-linux-x64.tar.gz
+wget https://github.com/dengshuit/cclinepro/releases/latest/download/ccline-linux-x64.tar.gz
 tar -xzf ccline-linux-x64.tar.gz
 cp ccline ~/.claude/ccline/
 chmod +x ~/.claude/ccline/ccline
@@ -125,7 +125,7 @@ chmod +x ~/.claude/ccline/ccline
 #### Option 2: Static Binary (Universal Compatibility)
 ```bash
 mkdir -p ~/.claude/ccline
-wget https://github.com/dengshuit/CCometixLine/releases/latest/download/ccline-linux-x64-static.tar.gz
+wget https://github.com/dengshuit/cclinepro/releases/latest/download/ccline-linux-x64-static.tar.gz
 tar -xzf ccline-linux-x64-static.tar.gz
 cp ccline ~/.claude/ccline/
 chmod +x ~/.claude/ccline/ccline
@@ -136,7 +136,7 @@ chmod +x ~/.claude/ccline/ccline
 
 ```bash  
 mkdir -p ~/.claude/ccline
-wget https://github.com/dengshuit/CCometixLine/releases/latest/download/ccline-macos-x64.tar.gz
+wget https://github.com/dengshuit/cclinepro/releases/latest/download/ccline-macos-x64.tar.gz
 tar -xzf ccline-macos-x64.tar.gz
 cp ccline ~/.claude/ccline/
 chmod +x ~/.claude/ccline/ccline
@@ -146,7 +146,7 @@ chmod +x ~/.claude/ccline/ccline
 
 ```bash
 mkdir -p ~/.claude/ccline  
-wget https://github.com/dengshuit/CCometixLine/releases/latest/download/ccline-macos-arm64.tar.gz
+wget https://github.com/dengshuit/cclinepro/releases/latest/download/ccline-macos-arm64.tar.gz
 tar -xzf ccline-macos-arm64.tar.gz
 cp ccline ~/.claude/ccline/
 chmod +x ~/.claude/ccline/ccline
@@ -157,7 +157,7 @@ chmod +x ~/.claude/ccline/ccline
 ```powershell
 # Create directory and download
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\ccline"
-Invoke-WebRequest -Uri "https://github.com/dengshuit/CCometixLine/releases/latest/download/ccline-windows-x64.zip" -OutFile "ccline-windows-x64.zip"
+Invoke-WebRequest -Uri "https://github.com/dengshuit/cclinepro/releases/latest/download/ccline-windows-x64.zip" -OutFile "ccline-windows-x64.zip"
 Expand-Archive -Path "ccline-windows-x64.zip" -DestinationPath "."
 Move-Item "ccline.exe" "$env:USERPROFILE\.claude\ccline\"
 ```
@@ -167,8 +167,8 @@ Move-Item "ccline.exe" "$env:USERPROFILE\.claude\ccline\"
 ### Build from Source
 
 ```bash
-git clone https://github.com/dengshuit/CCometixLine.git
-cd CCometixLine
+git clone https://github.com/dengshuit/cclinepro.git
+cd cclinepro
 cargo build --release
 
 # Linux/macOS
@@ -322,4 +322,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=dengshuit/CCometixLine&type=Date)](https://star-history.com/#dengshuit/CCometixLine&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=dengshuit/cclinepro&type=Date)](https://star-history.com/#dengshuit/cclinepro&Date)
