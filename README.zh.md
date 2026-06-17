@@ -1,24 +1,36 @@
-# CCometixLine
+# cclinepro
 
 [English](README.md) | [中文](README.zh.md)
 
-基于 Rust 的高性能 Claude Code 状态栏工具，集成 Git 信息、使用量跟踪、交互式 TUI 配置和 Claude Code 补丁工具。
+cclinepro 是基于 Rust 的高性能 Claude Code 状态栏工具，通过 `ccline` 命令提供 Git 状态、模型/上下文展示、API 使用量与会话指标、交互式 TUI 配置、主题管理和 Claude Code 增强工具。
 
 ![Language:Rust](https://img.shields.io/static/v1?label=Language&message=Rust&color=orange&style=flat-square)
 ![License:MIT](https://img.shields.io/static/v1?label=License&message=MIT&color=blue&style=flat-square)
 
 ## 截图
 
-![CCometixLine](assets/img1.png)
+![cclinepro](assets/img1.png)
 
 状态栏显示：模型 | 目录 | Git 分支状态 | 上下文窗口信息
+
+## 功能升级
+
+相比上游 `master` 分支，当前分支的功能升级重点是让 Context Window 段落更准确：
+
+- **优先读取官方 Context Window 输入**：当 Claude Code 的 statusline payload 中包含 `context_window` / `contextWindow` 时，优先使用官方数据，不再只依赖 transcript 解析。
+- **更准确的上下文窗口上限**：支持读取 `context_window_size` / `contextWindowSize`，因此 1M 等大上下文窗口会按真实上限显示。
+- **更准确的已用 token 计算**：优先使用 `total_input_tokens`；否则汇总当前 input、cache creation input、cache read input。output tokens 不计入已用上下文。
+- **百分比回退计算**：当只提供 `used_percentage` / `usedPercentage` 时，可结合官方上下文窗口大小反推已用 token。
+- **保留兼容回退**：官方 context 数据缺失或不完整时，继续使用原有 transcript 解析逻辑。
+- **字段格式兼容**：新增 Context Window 数据同时支持 snake_case 和 camelCase 字段。
+- **针对性测试覆盖**：新增官方数据优先、1M 上下文上限、排除 output tokens、transcript 回退、camelCase 反序列化等测试。
 
 ## 特性
 
 ### 核心功能
 - **Git 集成** 显示分支、状态和跟踪信息
-- **模型显示** 简化的 Claude 模型名称
-- **使用量跟踪** 基于转录文件分析  
+- **模型与上下文展示** 简化 Claude 模型名称并跟踪上下文窗口
+- **API 使用量、成本和会话指标** 在 Claude Code 提供相关数据时展示
 - **目录显示** 显示当前工作空间
 - **简洁设计** 使用 Nerd Font 图标
 
@@ -27,7 +39,7 @@
 - **TUI 配置界面** 实时预览配置效果
 - **主题系统** 多种内置预设主题
 - **段落自定义** 精细化控制各段落
-- **配置管理** 初始化、检查、编辑配置
+- **配置管理** 通过交互式主菜单完成初始化、检查和编辑
 
 ### Claude Code 增强
 - **禁用上下文警告** 移除烦人的"Context low"消息
@@ -179,7 +191,7 @@ cp target/release/ccometixline ~/.claude/ccline/ccline
 
 ```bash
 # 临时使用指定主题（覆盖配置文件设置）
-ccline --theme cometix
+ccline --theme default
 ccline --theme minimal
 ccline --theme gruvbox
 ccline --theme nord
@@ -221,12 +233,12 @@ ccline --patch ~/.local/share/fnm/node-versions/v24.4.1/installation/lib/node_mo
 
 ## 配置
 
-CCometixLine 支持通过 TOML 文件和交互式 TUI 进行完整配置：
+cclinepro 支持通过 TOML 文件和交互式 TUI 进行完整配置：
 
 - **配置文件**: `~/.claude/ccline/config.toml`
 - **交互式 TUI**: `ccline --config` 实时编辑配置并预览效果
 - **主题文件**: `~/.claude/ccline/themes/*.toml` 自定义主题文件
-- **自动初始化**: `ccline --init` 创建默认配置
+- **自动初始化**: 无 stdin 运行 `ccline` 后，可在主菜单中创建或检查配置
 
 ### 可用段落
 
@@ -236,7 +248,7 @@ CCometixLine 支持通过 TOML 文件和交互式 TUI 进行完整配置：
 - 颜色自定义
 - 格式选项
 
-支持的段落：目录、Git、模型、使用量、时间、成本、输出样式
+支持的段落：目录、Git、模型、上下文窗口、API 使用量、成本、会话、输出样式、更新提示
 
 ### 模型配置 (`models.toml`)
 
@@ -303,7 +315,7 @@ cargo build --release
 
 ## 上游致谢
 
-此 fork 由 panden 维护，基于 [Haleclipse/CCometixLine](https://github.com/Haleclipse/CCometixLine)。感谢原项目及其贡献者。
+cclinepro 由 panden 维护，基于[上游项目](https://github.com/Haleclipse/CCometixLine)。感谢原项目及其贡献者。
 
 ## 许可证
 

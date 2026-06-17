@@ -1,24 +1,36 @@
-# CCometixLine
+# cclinepro
 
 [English](README.md) | [中文](README.zh.md)
 
-A high-performance Claude Code statusline tool written in Rust with Git integration, usage tracking, interactive TUI configuration, and Claude Code enhancement utilities.
+cclinepro is a high-performance Claude Code statusline tool written in Rust. It provides Git status, model/context visibility, API usage and session metrics, interactive TUI configuration, theme management, and Claude Code enhancement utilities through the `ccline` command.
 
 ![Language:Rust](https://img.shields.io/static/v1?label=Language&message=Rust&color=orange&style=flat-square)
 ![License:MIT](https://img.shields.io/static/v1?label=License&message=MIT&color=blue&style=flat-square)
 
 ## Screenshots
 
-![CCometixLine](assets/img1.png)
+![cclinepro](assets/img1.png)
 
 The statusline shows: Model | Directory | Git Branch Status | Context Window Information
+
+## Functional Upgrades
+
+Compared with the upstream `master` branch, the functional upgrade in this branch focuses on more accurate Context Window rendering:
+
+- **Official Context Window input first**: reads Claude Code's `context_window` / `contextWindow` statusline payload when available, instead of relying only on transcript parsing.
+- **More accurate context limits**: uses `context_window_size` / `contextWindowSize` from Claude Code when provided, so large windows such as 1M context are displayed against the actual limit.
+- **Correct used-token calculation**: prefers `total_input_tokens`; otherwise sums current input, cache-creation input, and cache-read input tokens. Output tokens are intentionally not counted toward used context.
+- **Percentage fallback support**: when only `used_percentage` / `usedPercentage` is available, derives used tokens from the official percentage and context window size.
+- **Backward-compatible fallback**: keeps the original transcript-based parser as a fallback when official context data is missing or incomplete.
+- **Field compatibility**: accepts both snake_case and camelCase payload fields for the new Context Window data.
+- **Focused test coverage**: adds tests for official data priority, 1M context size metadata, output-token exclusion, transcript fallback, and camelCase deserialization.
 
 ## Features
 
 ### Core Functionality
 - **Git integration** with branch, status, and tracking info  
-- **Model display** with simplified Claude model names
-- **Usage tracking** based on transcript analysis
+- **Model and context display** with simplified Claude model names and context window tracking
+- **API usage, cost, and session metrics** when the related Claude Code data is available
 - **Directory display** showing current workspace
 - **Minimal design** using Nerd Font icons
 
@@ -27,7 +39,7 @@ The statusline shows: Model | Directory | Git Branch Status | Context Window Inf
 - **TUI configuration interface** with real-time preview
 - **Theme system** with multiple built-in presets
 - **Segment customization** with granular control
-- **Configuration management** (init, check, edit)
+- **Configuration management** through the interactive main menu
 
 ### Claude Code Enhancement
 - **Context warning disabler** - Remove annoying "Context low" messages
@@ -187,7 +199,7 @@ copy target\release\ccometixline.exe "$env:USERPROFILE\.claude\ccline\ccline.exe
 
 ```bash
 # Temporarily use specific theme (overrides config file)
-ccline --theme cometix
+ccline --theme default
 ccline --theme minimal
 ccline --theme gruvbox
 ccline --theme nord
@@ -229,12 +241,12 @@ Token usage percentage based on transcript analysis with context limit tracking.
 
 ## Configuration
 
-CCometixLine supports full configuration via TOML files and interactive TUI:
+cclinepro supports full configuration via TOML files and interactive TUI:
 
 - **Configuration file**: `~/.claude/ccline/config.toml`
 - **Interactive TUI**: `ccline --config` for real-time editing with preview
 - **Theme files**: `~/.claude/ccline/themes/*.toml` for custom themes
-- **Automatic initialization**: `ccline --init` creates default configuration
+- **Automatic initialization**: run `ccline` without stdin and use the main menu to create or check configuration
 
 ### Available Segments
 
@@ -244,7 +256,7 @@ All segments are configurable with:
 - Color customization
 - Format options
 
-Supported segments: Directory, Git, Model, Usage, Time, Cost, OutputStyle
+Supported segments: Directory, Git, Model, Context Window, Usage, Cost, Session, Output Style, Update
 
 ### Model Configuration (`models.toml`)
 
@@ -310,7 +322,7 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 
 ## Upstream / Acknowledgements
 
-This fork is maintained by panden and is based on [Haleclipse/CCometixLine](https://github.com/Haleclipse/CCometixLine). Thanks to the original project and contributors.
+cclinepro is maintained by panden and is based on the [upstream project](https://github.com/Haleclipse/CCometixLine). Thanks to the original project and contributors.
 
 ## Related Projects
 
